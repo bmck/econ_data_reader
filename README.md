@@ -20,6 +20,27 @@ Or install it yourself as:
 
     $ gem install econ_data_reader
 
+
+### Configuration
+
+Some data sources will require the specification of an API key.  These keys should be provided as part of a configuration file, e.g., config/econ_data_reader.rb
+
+```ruby
+EconDataReader::Fred.configure do |config|
+  config.fred_api_key = '1234567890ABCDEF'
+    OR
+  config.fred_api_key = File.read(File.join('','home', 'user', '.fred_api_key.txt'), 16)
+end
+
+EconDataReader::Bls.configure do |config|
+  config.bls_api_key = '8675309-1111-1111-ABCD'
+end
+
+EconDataReader::Nasdaq.configure do |config|
+  config.nasdaq_api_key = 'YOUR_API_KEY_HERE'
+end
+```    
+
 ## Usage
 
 ``` ruby

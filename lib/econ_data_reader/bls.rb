@@ -25,7 +25,7 @@ module EconDataReader
 
     def fetch(start: nil, fin: nil)
       dta = observations({ seriesid: ["\"#{tag}\""] })
-      Rails.logger.info { "#{__FILE__}:#{__LINE__} dta = #{dta.inspect}" }
+      # Rails.logger.info { "#{__FILE__}:#{__LINE__} dta = #{dta.inspect}" }
       dta = dta.parsed_response['Results']['series'].first['data']
       Rails.logger.info { "#{__FILE__}:#{__LINE__} dta = #{dta.inspect}" }
 
@@ -37,10 +37,16 @@ module EconDataReader
           dates << "#{d['year']}-#{d['period'][1..-1]*3}-01".to_date.end_of_month
         end
       end
-      dates = dates.map{|d| d.to_date }.select{|d| start.nil? ? true : d >= start }.select{|d| fin.nil? ? true : d <= fin }
+      dates = dates.map{|d| d.to_date }
       vals = dta.map{|d| d['value'].to_f }
+      (0..dates.length-1).to_a.reverse.each do |d|
+        if (start.present? && dates[d] <= start.to_date) || (fin.present? && dates[d] >= fin.to_date)
+          dates.delete_at(d)
+          vals.delete_at(d)
+        end
+      end
 
-      Polars::DataFrame.new({Timestamps: dates, Values: vals})
+      Polars::DataFrame.new({Timestamps: dates.reverse, Values: vals.reverse})
     end
 
     protected
