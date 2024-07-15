@@ -1,3 +1,5 @@
+require 'httparty'
+
 module EconDataReader
   class Nasdaq
     # Get data for the given name from the Bank of Canada.

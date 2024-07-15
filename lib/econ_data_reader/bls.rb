@@ -1,8 +1,10 @@
+require 'httparty'
+
 module EconDataReader
   class Bls
     # Get data for the given name from the Bank of Canada.
 
-    include HTTParty
+    include ::HTTParty
     base_uri "https://api.bls.gov/publicAPI/v2/timeseries/data"
     format :json
     # debug_output $stdout
