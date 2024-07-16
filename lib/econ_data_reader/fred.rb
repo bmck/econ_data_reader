@@ -48,20 +48,15 @@ module EconDataReader
       urls = names.map { |n| "#{_url}?id=#{n}" }
 
       data_frames = urls.zip(names).map { |url, nm| _fetch_data(url, nm) }
-      Rails.logger.info { "#{__FILE__}:#{__LINE__} data_frames = #{data_frames.inspect}" }
       df = data_frames.reduce({}) { |acc, df| acc.merge(df) { |_, old_val, new_val| old_val || new_val } }
-      Rails.logger.info { "#{__FILE__}:#{__LINE__} df = #{df.inspect}" }
       df
     end
 
     def _fetch_data(url, nm)
       # Utility to fetch data
       resp = self.class.get(url).parsed_response.map{|a| a.join(',')}.join("\n")
-      Rails.logger.info { "#{__FILE__}:#{__LINE__} resp = #{resp.inspect}" }
       data = CSV.parse(resp, headers: true, header_converters: :symbol, converters: [:date, :integer])
-      Rails.logger.info { "#{__FILE__}:#{__LINE__} nm = #{nm}, data = #{data.inspect}" }
       data = data.map { |row| [Date.parse(row[:date].to_s), row[data.headers.last].to_i] }.to_h
-      Rails.logger.info { "#{__FILE__}:#{__LINE__} data = #{data.inspect}" }
 
       data
     end
