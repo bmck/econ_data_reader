@@ -55,8 +55,8 @@ module EconDataReader
     def _fetch_data(url, nm)
       # Utility to fetch data
       resp = self.class.get(url).parsed_response.map{|a| a.join(',')}.join("\n")
-      data = CSV.parse(resp, headers: true, header_converters: :symbol, converters: [:date, :integer])
-      data = data.map { |row| [Date.parse(row[:date].to_s), row[data.headers.last].to_i] }.to_h
+      data = CSV.parse(resp, headers: true, header_converters: :symbol, converters: [:date, :float])
+      data = data.map { |row| [Date.parse(row[:date].to_s), row[data.headers.last].to_f] }.to_h
 
       data
     end
