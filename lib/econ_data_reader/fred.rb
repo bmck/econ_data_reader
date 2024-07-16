@@ -41,11 +41,11 @@ module EconDataReader
 
     private
 
-    def _url; "https://fred.stlouisfed.org/graph/fredgraph.csv"; end
+    def _url(n); "https://api.stlouisfed.org/fred/series/observations?series_id=#{n}&api_key=#{api_key}"; end
 
     def _read(symbols)
       names = Array(symbols)
-      urls = names.map { |n| "#{_url}?id=#{n}" }
+      urls = names.map { |n| _url(n) }
 
       data_frames = urls.zip(names).map { |url, nm| _fetch_data(url, nm) }
       df = data_frames.reduce({}) { |acc, df| acc.merge(df) { |_, old_val, new_val| old_val || new_val } }
