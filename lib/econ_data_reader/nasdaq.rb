@@ -1,3 +1,4 @@
+require 'polars-df'
 require 'httparty'
 
 module EconDataReader

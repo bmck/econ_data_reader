@@ -1,10 +1,10 @@
+require 'polars-df'
 require 'httparty'
 require 'csv'
 
 module EconDataReader
   class Fred
     # Get data for the given name from the St. Louis FED (FRED).
-    extend ActiveSupport::Concern
 
     include ::HTTParty
     attr_reader :tag
@@ -24,7 +24,7 @@ module EconDataReader
     end
 
     def fetch(start: nil, fin: nil, interval: '1d')
-      data = _fetch_data(tag, interval)
+      data = _fetch_data(interval)
       i = interval[0..-2].to_i
 
       begin
@@ -43,19 +43,22 @@ module EconDataReader
 
     private
 
-    def _url(n, i = 'd'); 
-      "https://api.stlouisfed.org/fred/series/observations?series_id=#{n}&api_key=#{@api_key}&frequency=#{i}"
+    def _url(n, i = 'm'); 
+      "https://api.stlouisfed.org/fred/series/observations?series_id=#{n}&api_key=#{@api_key}#{i != 'd' ? "&frequency=#{i}" : ''}"
     end
 
 
-    def _fetch_data(nm, interval)
+    def _fetch_data(interval)
       # Utility to fetch data
       i = interval.strip[-1]
+      nm = tag
       resp = nil
+
       if nm == 'SP500' && i == 'm'
         resp = sp500
       else
-        resp = self.class.get(_url(nm, interval[-1])).parsed_response['observations']['observation'] #.map{|a| a.join(',')}.join("\n")
+        resp = self.class.get(_url(nm, interval[-1]))
+        resp = resp.parsed_response['observations']['observation'] #.map{|a| a.join(',')}.join("\n")
         resp = "date, #{nm}\n" + resp.map{|r| "#{r['date']},#{r['value']}" }.join("\n")
       end
       data = CSV.parse(resp, headers: true, header_converters: :symbol, converters: [:date, :float])

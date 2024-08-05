@@ -4,6 +4,7 @@ require 'econ_data_reader/bank_of_canada'
 require 'econ_data_reader/bls'
 require 'econ_data_reader/fred'
 require 'econ_data_reader/nasdaq'
+require 'econ_data_reader/sahm'
 
 directory = File.expand_path(File.dirname(__FILE__))
 
